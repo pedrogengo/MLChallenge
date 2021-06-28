@@ -53,7 +53,7 @@ jobs:
         pytest app/processing/test/
 
   deploy:
-    needs: build-entrypoint
+    needs: build-processing
     runs-on: ubuntu-20.04
     steps:      
       - uses: actions/checkout@v2
