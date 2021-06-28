@@ -26,7 +26,7 @@ jobs:
         flake8 app/entrypoint/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest app/entrypoint/test/
+        pytest app/entrypoint/test
 
   build-processing:
     needs: build-entrypoint
@@ -50,7 +50,7 @@ jobs:
         flake8 app/processing --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest app/processing/test/
+        pytest app/processing/test
 
   deploy:
     needs: build-processing
