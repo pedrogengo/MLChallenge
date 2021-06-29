@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Lambda Container
+Resources:
+
+
+  Entrypoint:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: crawler-entrypoint
+      Role: !GetAtt Role.Arn
+      PackageType: Image
+      Code:
+        ImageUri: 977053370764.dkr.ecr.us-east-1.amazonaws.com/discovery:latest
+      Timeout: 5
+      Environment:
+        Variables:
+          bucket: crawler-ml-challenge
+
+
+  FeatureGeneration:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: crawler-feature-generation
+      Role: !GetAtt Role.Arn
+      PackageType: Image
+      Code:
+        ImageUri: 977053370764.dkr.ecr.us-east-1.amazonaws.com/discovery:latest
+      Timeout: 5
+      Environment:
+        Variables:
+          bucket: crawler-ml-challenge
+
+  Processing:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: crawler-processing
+      Role: !GetAtt Role.Arn
+      PackageType: Image
+      Code:
+        ImageUri: 977053370764.dkr.ecr.us-east-1.amazonaws.com/discovery:latest
+      Timeout: 5
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref UrlsQueue
+  
+  BatchEvent:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: crawler-batch-event
+      Role: !GetAtt Role.Arn
+      PackageType: Image
+      Code:
+        ImageUri: 977053370764.dkr.ecr.us-east-1.amazonaws.com/discovery:latest
+      Timeout: 5
+      Environment:
+        Variables:
+          BUCKET: crawler-ml-challenge
+          QUEUE_URL: !Ref UrlsQueue
+
+  UrlsQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: urls-queue
+
+  SQSTrigger:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties: 
+      EventSourceArn: !GetAtt UrlsQueue.Arn
+      FunctionName: !Ref Processing
+
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: lambda-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: lambda-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - "cloudwatch:*"
+                  - "ec2:DescribeSecurityGroups"
+                  - "ec2:DescribeSubnets"
+                  - "ec2:DescribeVpcs"
+                  - "events:*"
+                  - "iam:GetPolicy"
+                  - "iam:GetPolicyVersion"
+                  - "iam:GetRole"
+                  - "iam:GetRolePolicy"
+                  - "iam:ListAttachedRolePolicies"
+                  - "iam:ListRolePolicies"
+                  - "iam:ListRoles"
+                  - "iam:PassRole"
+                  - "kms:ListAliases"
+                  - "lambda:*"
+                  - "logs:*"
+                  - "tag:GetResources"
+                  - "s3: *"
+                  - "sqs: *"
+                  - "rds: *"
+                Resource: '*'
+      MaxSessionDuration: 3600 
