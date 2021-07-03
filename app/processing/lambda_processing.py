@@ -1,11 +1,12 @@
 import logging
-from urllib.parse import urljoin
 import requests
+import json
+from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
 
 class Crawler:
-    """A crawler is allows us to enter a link and obtain information about it.
+    """A crawler allows us to enter a link and obtain information about it.
     
     With Crawler we can pass a URL and find other URLs that are referenced in it.
 
@@ -19,19 +20,20 @@ class Crawler:
         self.visited_urls = visited_urls
         self.urls_to_visit = []
         self.query_url = url
-        self.count_references = 0
 
     def download_url(self, url):
         return requests.get(url).text
 
     def get_linked_urls(self, url, html):
+        paths = []
         soup = BeautifulSoup(html, 'html.parser')
         for link in soup.find_all('a'):
             path = link.get('href')
-            print(path)
-            if path and path.startswith('/'):
-                path = urljoin(url, path)
-            yield path
+            if path:
+                if path.startswith('/'):
+                    path = urljoin(url, path)
+                paths.append(path)
+        return paths
 
     def add_url_to_visit(self, url):
         self.count_references += 1
@@ -44,20 +46,27 @@ class Crawler:
             self.add_url_to_visit(url)
 
     def run(self):
-            url = self.query_url
-            logging.info(f'Crawling: {url}')
-            try:
-                self.crawl(url)
-            except Exception:
-                logging.exception(f'Failed to crawl: {url}')
-            finally:
-                self.visited_urls.append(url)
+        url = self.query_url
+        logging.info(f'Crawling: {url}')
+        try:
+            self.crawl(url)
+        except Exception:
+            logging.exception(f'Failed to crawl: {url}')
+        finally:
+            self.visited_urls.append(url)
 
 
     def handler(event, context):
         visited_urls = []
         for record in event["Records"]:
-            query_url = record['Body']['query_url']
+            body = json.loads(record['body'])
+            depth = body['Depth']
+            query_url = body['Link']
+            
             crawler = Crawler(query_url, visited_urls=visited_urls)
             crawler.run()
+            if depth == 1:
+                return 
+            else:
+                
         return crawler.urls_to_visit, crawler.count_references
