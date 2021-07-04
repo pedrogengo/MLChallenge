@@ -15,6 +15,7 @@ In this challenge we developed a crawler application which retrieves information
 
 ## Architecture
 
+
 ## Understanding the repository
 
 ```
@@ -52,5 +53,14 @@ In this challenge we developed a crawler application which retrieves information
 |   +-- infra.yaml: IaaC contaning all resources required for our application
 +-- README.md
 ```
+
+## Configuring in your account
+
+To use this application in your account you should follow the following steps:
+
+1. Fork this repository;
+2. Add your AWS credentials in Github Secrets;
+3. Make a commit to start the CI CD pipeline;
+
 
 ## Future works

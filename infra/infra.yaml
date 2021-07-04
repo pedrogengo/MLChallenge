@@ -121,8 +121,12 @@ Resources:
         - 
           AttributeName: link
           KeyType: HASH
-      
       TableName: !Ref DynamoTableName
+      ProvisionedThroughput:
+        - 
+           ReadCapacityUnits: 5
+           WriteCapacityUnits: 5
+
 
   Role:
     Type: AWS::IAM::Role
