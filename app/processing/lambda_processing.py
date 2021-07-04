@@ -161,10 +161,17 @@ def handler(event, context):
         # Sending entries to sqs
         try:
             next_links = set(references) - set(visited_urls)
+            for i in range(int(len(next_links)%10)):
+                sqs_entries = [{'Id': str(i), 'MessageBody': f'{{"Link": "{link}", "Depth": {depth - 1}}}'}
+                            for i, link in enumerate(next_links[(i*10):(10*(i+1))])]
+                resp = sqs.send_message_batch(QueueUrl=queue_url, Entries=sqs_entries)
+                logger.info("Send result: %s", resp)
+
             sqs_entries = [{'Id': str(i), 'MessageBody': f'{{"Link": "{link}", "Depth": {depth - 1}}}'}
-                           for i, link in enumerate(next_links)]
+                            for i, link in enumerate(next_links[(10*(i+1)):])]
             resp = sqs.send_message_batch(QueueUrl=queue_url, Entries=sqs_entries)
             logger.info("Send result: %s", resp)
+
             body = {
                 'next_urls': next_links,
                 'depth': depth-1,
