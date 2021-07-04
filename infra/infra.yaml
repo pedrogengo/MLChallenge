@@ -106,8 +106,8 @@ Resources:
                   - "lambda:*"
                   - "logs:*"
                   - "tag:GetResources"
-                  - "s3: *"
-                  - "sqs: *"
-                  - "dynamodb: *"
+                  - "s3:*"
+                  - "sqs:*"
+                  - "dynamodb:*"
                 Resource: '*'
       MaxSessionDuration: 3600 
