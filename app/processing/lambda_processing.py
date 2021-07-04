@@ -160,7 +160,8 @@ def handler(event, context):
 
         # Sending entries to sqs
         try:
-            next_links = set(references) - set(visited_urls)
+            next_links = list(set(references) - set(visited_urls))
+            i = 0
             for i in range(int(len(next_links)%10)):
                 sqs_entries = [{'Id': str(i), 'MessageBody': f'{{"Link": "{link}", "Depth": {depth - 1}}}'}
                             for i, link in enumerate(next_links[(i*10):(10*(i+1))])]

@@ -135,4 +135,5 @@ jobs:
           aws cloudformation deploy \
             --stack-name crawler-stack \
             --template-file infra/infra.yaml \
-            --capabilities CAPABILITY_NAMED_IAM
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameters ParameterKey=EntrypointImage,ParameterValue=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-entrypoint:latest ParameterKey=FeatureGenerationImage,ParameterValue=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-feature-generation:latest ParameterKey=BatchEventImage,ParameterValue=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-batch-event:latest ParameterKey=ProcessingImage,ParameterValue=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-processing:latest
