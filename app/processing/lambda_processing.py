@@ -55,11 +55,11 @@ class Crawler:
             logging.exception(f'Failed to crawl: {url}')
 
 def get_visited_urls(client, tablename):
-    table = client.Table(tablename)
-    response = table.scan()
+    response = client.Table(TableName=tablename)
     data = response['Items']
     while 'LastEvaluatedKey' in response:
-        response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+        response = client.scan(TableName=tablename,
+                               ExclusiveStartKey=response['LastEvaluatedKey'])
         data.extend(response['Items'])
     
     if len(data) > 0:

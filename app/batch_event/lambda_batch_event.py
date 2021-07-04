@@ -11,6 +11,7 @@ def get_environment_variables():
 
 def handler(event, context):
     logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
 
     # Start clients
     s3 = boto3.client('s3')
@@ -23,7 +24,7 @@ def handler(event, context):
         query_table = event['Records'][0]['s3']['object']['key']
 
     except KeyError:
-        logger.error('Integration error with S3. Try again later')
+        logger.debug('ERROIntegration error with S3. Try again later')
         return {
             'statusCode': 500,
             'body': json.dumps('Integration error with S3. Try again later')
