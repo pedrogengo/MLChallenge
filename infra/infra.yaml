@@ -17,6 +17,10 @@ Parameters:
   ProcessingImage:
     Type: String
     Description: Enter de ImageUri of lambda application.
+
+  PredictImage:
+    Type: String
+    Description: Enter de ImageUri of lambda application.
   
   S3BucketName:
     Type: String
@@ -28,6 +32,10 @@ Parameters:
     Default: crawler_appearences
     Description: Table name of our database.
 
+  BucketModelName:
+    Type: String
+    Default: bucket-model
+    Description: Bucket name of our model registry
 
 Resources:
 
@@ -40,6 +48,21 @@ Resources:
       Code:
         ImageUri: !Ref EntrypointImage
       Timeout: 10
+  
+  Predict:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: crawler-predict-appearances
+      Role: !GetAtt Role.Arn
+      PackageType: Image
+      Code:
+        ImageUri: !Ref PredictImage
+      Timeout: 10
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DynamoTableName
+          MODEL_NAME: 'NOTHING'
+          BUCKET_NAME: !Ref BucketModelName
 
   FeatureGeneration:
     Type: AWS::Lambda::Function
@@ -109,6 +132,11 @@ Resources:
                   - Name: prefix
                     Value: inputs/
             Function: !GetAtt BatchEvent.Arn
+  
+  BucketModel:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketModelName
   
   S3InvokePermission:
     Type: AWS::Lambda::Permission

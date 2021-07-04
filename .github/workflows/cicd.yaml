@@ -97,8 +97,31 @@ jobs:
       run: |
         pytest app/batch_event/test
 
+  build-predict:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f app/predict/requirements.txt ]; then pip install -r app/predict/requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 app/predict --count --select=E9,F63,F7,F82 --show-source --statistics 
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 app/predict --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Test with pytest
+      run: |
+        pytest app/predict/test
+
   deploy:
-    needs: [build-processing, build-batch-event, build-feature-generation, build-entrypoint]
+    needs: [build-processing, build-batch-event, build-feature-generation, build-entrypoint, build-predict]
     runs-on: ubuntu-20.04
     steps:      
       - uses: actions/checkout@v2
@@ -117,18 +140,22 @@ jobs:
           aws ecr create-repository --repository-name crawler-feature-generation || true
           aws ecr create-repository --repository-name crawler-processing || true
           aws ecr create-repository --repository-name crawler-batch-event || true
+          aws ecr create-repository --repository-name crawler-predict-appearances || true
           docker build -t crawler-entrypoint -f dockerfiles/lambda_entrypoint.dockerfile .
           docker build -t crawler-feature-generation -f dockerfiles/lambda_feature_generation.dockerfile .
           docker build -t crawler-processing -f dockerfiles/lambda_processing.dockerfile .
           docker build -t crawler-batch-event -f dockerfiles/lambda_batch_event.dockerfile .
+          docker build -t crawler-predict-appearances -f dockerfiles/lambda_predict.dockerfile .
           docker tag crawler-entrypoint:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-entrypoint:latest
           docker tag crawler-feature-generation:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-feature-generation:latest
           docker tag crawler-processing:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-processing:latest
           docker tag crawler-batch-event:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-batch-event:latest
+          docker tag crawler-predict-appearances:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-predict-appearances:latest
           docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-entrypoint:latest
           docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-feature-generation:latest
           docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-processing:latest
           docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-batch-event:latest
+          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-predict-appearances:latest
 
       - name: Create or update lambda function
         run: | 
@@ -136,4 +163,4 @@ jobs:
             --stack-name crawler-stack \
             --template-file infra/infra.yaml \
             --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides EntrypointImage=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-entrypoint:latest FeatureGenerationImage=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-feature-generation:latest BatchEventImage=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-batch-event:latest ProcessingImage=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-processing:latest
+            --parameter-overrides EntrypointImage=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-entrypoint:latest FeatureGenerationImage=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-feature-generation:latest BatchEventImage=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-batch-event:latest ProcessingImage=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-processing:latest PredictImage=${{ secrets.ACCOUNT_ID }}.dkr.ecr.sa-east-1.amazonaws.com/crawler-predict-appearances:latest
