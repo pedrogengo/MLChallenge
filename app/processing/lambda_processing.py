@@ -112,7 +112,7 @@ def handler(event, context):
     depth = body['Depth']
     query_url = body['Link']
     
-    crawler = Crawler(query_url, visited_urls=visited_urls)
+    crawler = Crawler(query_url)
     crawler.run()
     references = crawler.urls_to_visit
 
