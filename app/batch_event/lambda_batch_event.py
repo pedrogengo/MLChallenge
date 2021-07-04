@@ -21,7 +21,7 @@ def handler(event, context):
 
     # Getting the content of csv inside s3 bucket
     try:
-        query_table = event['Records']['s3']['object']['key']
+        query_table = event['Records'][0]['s3']['object']['key']
 
     except KeyError:
         return {

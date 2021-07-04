@@ -141,6 +141,9 @@ def handler(event, context):
                 },
                 'features': {
                     'M': dynamo_features
+                },
+                'appearances': {
+                    'N': '0'
                 }
             }
         )
