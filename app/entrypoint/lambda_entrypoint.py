@@ -16,4 +16,4 @@ def handler(event, context):
                                            Payload=json.dumps(msg))
     print(invoke_response)
     if invoke_response['StatusCode'] == 200:
-        return invoke_response['Payload'].read().decode('utf-8')
+        return json.loads(invoke_response['Payload'].read().decode('utf-8'))
