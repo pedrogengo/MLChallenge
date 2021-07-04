@@ -157,16 +157,16 @@ def handler(event, context):
             'details': 'Done'
         }
     else:
-        # queue_url = sqs.get_queue_url(QueueName=queue_name).get('QueueUrl')
-        # logger.debug("Queue URL is %s", queue_url)
 
         # Sending entries to sqs
         try:
-            message_body = f'{{"Link": "{link}", "Depth": {depth-1}}}'
-            resp = sqs.send_message(QueueUrl=queue_url, MessageBody=message_body)
-            # logger.debug("Send result: %s", resp)
+            next_links = set(references) - set(visited_urls)
+            sqs_entries = [{'Id': str(i), 'MessageBody': f'{{"Link": "{link}", "Depth": {depth - 1}}}'}
+                           for i, link in enumerate(next_links)]
+            resp = sqs.send_message_batch(QueueUrl=queue_url, Entries=sqs_entries)
+            logger.info("Send result: %s", resp)
             body = {
-                'query_url': query_url,
+                'next_urls': next_links,
                 'depth': depth-1,
                 'details': 'Going deeper'
             }
