@@ -9,13 +9,6 @@ def test_crawler_init():
     assert c.query_url == query_url
     assert c.visited_urls == []
 
-    # Test passing value to default arg
-    query_url = 'https://www.google.com'
-    visited = ['https://www.amazon.com']
-    c = lambda_processing.Crawler(query_url, visited)
-    assert c.query_url == query_url
-    assert c.visited_urls == visited
-
 @patch('lambda_processing.requests')
 def test_download_url(mock_requests):
     mock_requests.get().text = 'HTML'

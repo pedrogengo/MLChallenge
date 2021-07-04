@@ -18,7 +18,7 @@ class Crawler:
         database.
     """
 
-    def __init__(self, url, visited_urls = []):
+    def __init__(self, url):
         # self.visited_urls = visited_urls
         self.urls_to_visit = []
         self.query_url = url
