@@ -113,10 +113,10 @@ jobs:
       - name: Build and Push image
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
-          docker build -t crawler_entrypoint dockerfiles/lambda_entrypoint.dockerfile
-          docker build -t crawler_feature_generation dockerfiles/lambda_feature_generation.dockerfile
-          docker build -t crawler_processing dockerfiles/lambda_processing.dockerfile
-          docker build -t crawler_batch_event dockerfiles/lambda_batch_event.dockerfile
+          docker build -t crawler_entrypoint -f dockerfiles/lambda_entrypoint.dockerfile .
+          docker build -t crawler_feature_generation -f dockerfiles/lambda_feature_generation.dockerfile .
+          docker build -t crawler_processing -f dockerfiles/lambda_processing.dockerfile .
+          docker build -t crawler_batch_event -f dockerfiles/lambda_batch_event.dockerfile .
           docker tag crawler_entrypoint:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler_entrypoint:latest
           docker tag crawler_feature_generation:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler_feature_generation:latest
           docker tag crawler_processing:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler_processing:latest
