@@ -9,10 +9,10 @@ logger.setLevel(logging.DEBUG)
 def handler(event, context):
     lambda_client = boto3.client('lambda')
 
-    link = event['pathParameters']['link']
+    link = event['queryStringParameters']['link']
     msg = {"link": link}
 
-    invoke_response = lambda_client.invoke(FunctionName="feature_generation",
+    invoke_response = lambda_client.invoke(FunctionName="feature-generation",
                                            InvocationType='Event',
                                            Payload=json.dumps(msg))
     print(invoke_response)
