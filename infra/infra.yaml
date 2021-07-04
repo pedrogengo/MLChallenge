@@ -10,7 +10,7 @@ Resources:
       Role: !GetAtt Role.Arn
       PackageType: Image
       Code:
-        ImageUri: 977053370764.dkr.ecr.us-east-1.amazonaws.com/discovery:latest
+        ImageUri: 275448561531.dkr.ecr.us-east-1.amazonaws.com/crawler_entrypoint:latest
       Timeout: 5
       Environment:
         Variables:
@@ -24,7 +24,7 @@ Resources:
       Role: !GetAtt Role.Arn
       PackageType: Image
       Code:
-        ImageUri: 977053370764.dkr.ecr.us-east-1.amazonaws.com/discovery:latest
+        ImageUri: 275448561531.dkr.ecr.us-east-1.amazonaws.com/crawler_feature_generation:latest
       Timeout: 5
       Environment:
         Variables:
@@ -37,7 +37,7 @@ Resources:
       Role: !GetAtt Role.Arn
       PackageType: Image
       Code:
-        ImageUri: 977053370764.dkr.ecr.us-east-1.amazonaws.com/discovery:latest
+        ImageUri: 275448561531.dkr.ecr.us-east-1.amazonaws.com/crawler_processing:latest
       Timeout: 5
       Environment:
         Variables:
@@ -50,7 +50,7 @@ Resources:
       Role: !GetAtt Role.Arn
       PackageType: Image
       Code:
-        ImageUri: 977053370764.dkr.ecr.us-east-1.amazonaws.com/discovery:latest
+        ImageUri: 275448561531.dkr.ecr.us-east-1.amazonaws.com/crawler_batch_event:latest
       Timeout: 5
       Environment:
         Variables:
@@ -108,6 +108,6 @@ Resources:
                   - "tag:GetResources"
                   - "s3: *"
                   - "sqs: *"
-                  - "rds: *"
+                  - "dynamodb: *"
                 Resource: '*'
       MaxSessionDuration: 3600 
