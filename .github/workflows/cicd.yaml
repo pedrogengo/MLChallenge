@@ -113,26 +113,26 @@ jobs:
       - name: Build and Push image
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
-          aws ecr describe-repositories --repository-names crawler_entrypoint || aws ecr create-repository --repository-name crawler_entrypoint
-          aws ecr describe-repositories --repository-names crawler_feature_generation || aws ecr create-repository --repository-name crawler_feature_generation
-          aws ecr describe-repositories --repository-names crawler_processing || aws ecr create-repository --repository-name crawler_processing
-          aws ecr describe-repositories --repository-names crawler_batch_event || aws ecr create-repository --repository-name crawler_batch_event
-          docker build -t crawler_entrypoint -f dockerfiles/lambda_entrypoint.dockerfile .
-          docker build -t crawler_feature_generation -f dockerfiles/lambda_feature_generation.dockerfile .
-          docker build -t crawler_processing -f dockerfiles/lambda_processing.dockerfile .
-          docker build -t crawler_batch_event -f dockerfiles/lambda_batch_event.dockerfile .
-          docker tag crawler_entrypoint:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler_entrypoint:latest
-          docker tag crawler_feature_generation:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler_feature_generation:latest
-          docker tag crawler_processing:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler_processing:latest
-          docker tag crawler_batch_event:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler_batch_event:latest
-          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler_entrypoint:latest
-          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler_feature_generation:latest
-          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler_processing:latest
-          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler_batch_event:latest
+          aws ecr create-repository --repository-name crawler-entrypoint || true
+          aws ecr create-repository --repository-name crawler-feature-generation || true
+          aws ecr create-repository --repository-name crawler-processing || true
+          aws ecr create-repository --repository-name crawler-batch-event || true
+          docker build -t crawler-entrypoint -f dockerfiles/lambda_entrypoint.dockerfile .
+          docker build -t crawler-feature-generation -f dockerfiles/lambda_feature_generation.dockerfile .
+          docker build -t crawler-processing -f dockerfiles/lambda_processing.dockerfile .
+          docker build -t crawler-batch-event -f dockerfiles/lambda_batch_event.dockerfile .
+          docker tag crawler-entrypoint:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler-entrypoint:latest
+          docker tag crawler-feature-generation:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler-feature-generation:latest
+          docker tag crawler-processing:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler-processing:latest
+          docker tag crawler-batch-event:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler-batch-event:latest
+          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler-entrypoint:latest
+          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler-feature-generation:latest
+          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler-processing:latest
+          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crawler-batch-event:latest
 
       - name: Create or update lambda function
         run: | 
           aws cloudformation deploy \
-            --stack-name crawler_stack \
+            --stack-name crawler-stack \
             --template-file infra/infra.yaml \
             --capabilities CAPABILITY_NAMED_IAM
