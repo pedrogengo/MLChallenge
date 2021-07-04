@@ -3,8 +3,6 @@ import logging
 import json
 import os
 
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
 
 class Link():
     def __init__(self, url):
@@ -91,7 +89,7 @@ class Link():
         return features
 
 def update_features(client, table, link, features):
-
+    # Add features to an existing key
     response = client.update_item(
         TableName=table,
         Key={
@@ -109,6 +107,9 @@ def update_features(client, table, link, features):
 
 
 def handler(event, context):
+
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
 
     # Starting dynamodb client
     client = boto3.client('dynamodb')
@@ -142,9 +143,6 @@ def handler(event, context):
                 'features': {
                     'M': dynamo_features
                 },
-                'appearances': {
-                    'N': '0'
-                }
             }
         )
 

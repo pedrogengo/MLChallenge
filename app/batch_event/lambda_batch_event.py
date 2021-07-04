@@ -33,19 +33,30 @@ def handler(event, context):
     csv_response = s3.get_object(Bucket=bucket, Key=query_table)
     csv_reader = csv_response['Body'].read().decode('utf-8').split('\r\n')
 
-    # Creating the list to send in batch format for sqs
-    sqs_entries = [{'Id': str(i), 'MessageBody': f'{{"Link": "{link}", "Depth": {depth}}}'}
-                   for i, link in enumerate(csv_reader)]
-    logger.info('SQS Entries: %s', sqs_entries)
-
     # Retrieve the queue url, in order to use sqs api
-    # queue_url = sqs.get_queue_url(QueueName=queue_name).get('QueueUrl')
     logger.info("Queue URL is %s", queue_url)
 
     # Sending entries to sqs
     try:
+        # Creating the list to send in batch format for sqs
+        i = 0
+
+        # We need to apply this because the method send_message_batch has a limit of 10 entries
+        for i in range(int(len(csv_reader)//10)):
+            sqs_entries = [{'Id': str(j), 'MessageBody': f'{{"Link": "{link}", "Depth": {depth}}}'}
+                        for j, link in enumerate(csv_reader[(i*10):(10*(i+1))])]
+            resp = sqs.send_message_batch(QueueUrl=queue_url, Entries=sqs_entries)
+            logger.info("Send result: %s", resp)
+        
+        # In case of len(next_link) < 10
+        if i == 0:
+            i = -1
+
+        sqs_entries = [{'Id': str(j), 'MessageBody': f'{{"Link": "{link}", "Depth": {depth}}}'}
+                        for j, link in enumerate(csv_reader[(10*(i+1)):])]
         resp = sqs.send_message_batch(QueueUrl=queue_url, Entries=sqs_entries)
         logger.info("Send result: %s", resp)
+
         return {
             'statusCode': 200,
             'body': json.dumps('Done!')

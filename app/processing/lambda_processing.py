@@ -162,11 +162,17 @@ def handler(event, context):
         try:
             next_links = list(set(references) - set(visited_urls))
             i = 0
-            for i in range(int(len(next_links)%10)):
+
+            # We need to apply this because the method send_message_batch has a limit of 10 entries
+            for i in range(int(len(next_links)//10)):
                 sqs_entries = [{'Id': str(i), 'MessageBody': f'{{"Link": "{link}", "Depth": {depth - 1}}}'}
                             for i, link in enumerate(next_links[(i*10):(10*(i+1))])]
                 resp = sqs.send_message_batch(QueueUrl=queue_url, Entries=sqs_entries)
                 logger.info("Send result: %s", resp)
+
+            # In case of len(next_link) < 10
+            if i == 0:
+                i = -1
 
             sqs_entries = [{'Id': str(i), 'MessageBody': f'{{"Link": "{link}", "Depth": {depth - 1}}}'}
                             for i, link in enumerate(next_links[(10*(i+1)):])]
