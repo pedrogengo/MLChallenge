@@ -97,7 +97,7 @@ Resources:
   
   BucketCsv:
     Type: AWS::S3::Bucket
-    DependsOn: BatchEvent
+    DependsOn: S3InvokePermission
     Properties:
       BucketName: !Ref S3BucketName
       NotificationConfiguration:
@@ -109,6 +109,19 @@ Resources:
                   - Name: prefix
                     Value: inputs/
             Function: !GetAtt BatchEvent.Arn
+  
+  S3InvokePermission:
+    Type: AWS::Lambda::Permission
+    DependsOn: BatchEvent
+    Properties:
+      FunctionName:
+        Fn::GetAtt:
+          - BatchEvent
+          - Arn
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceArn:
+        Fn::Sub: arn:aws:s3:::${S3BucketName}
   
   Database:
     Type: AWS::DynamoDB::Table
