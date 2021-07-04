@@ -123,9 +123,8 @@ Resources:
           KeyType: HASH
       TableName: !Ref DynamoTableName
       ProvisionedThroughput:
-        - 
-           ReadCapacityUnits: 5
-           WriteCapacityUnits: 5
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5 
 
 
   Role:
