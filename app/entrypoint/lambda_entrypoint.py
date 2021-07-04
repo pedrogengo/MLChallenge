@@ -12,7 +12,7 @@ def handler(event, context):
     link = event['queryStringParameters']['link']
     msg = {"link": link}
 
-    invoke_response = lambda_client.invoke(FunctionName="feature-generation",
+    invoke_response = lambda_client.invoke(FunctionName="crawler-feature-generation",
                                            InvocationType='Event',
                                            Payload=json.dumps(msg))
     print(invoke_response)
