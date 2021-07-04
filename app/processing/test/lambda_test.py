@@ -7,7 +7,6 @@ def test_crawler_init():
     query_url = 'https://www.google.com'
     c = lambda_processing.Crawler(query_url)
     assert c.query_url == query_url
-    assert c.visited_urls == []
 
 @patch('lambda_processing.requests')
 def test_download_url(mock_requests):
