@@ -97,7 +97,7 @@ def update_appearances(client, table, link, appearances):
         },
         UpdateExpression='set appearances=appearances + :f',
         ExpressionAttributeValues={
-            ':f': {'N': appearances}
+            ':f': {'N': str(appearances)}
         },
         ReturnValues='UPDATED_NEW'
     )

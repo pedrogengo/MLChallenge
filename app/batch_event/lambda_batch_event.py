@@ -31,7 +31,7 @@ def handler(event, context):
         }
     
     csv_response = s3.get_object(Bucket=bucket, Key=query_table)
-    csv_reader = csv_response['Body'].read().decode('utf-8').split('\n')
+    csv_reader = csv_response['Body'].read().decode('utf-8').split('\r\n')
 
     # Creating the list to send in batch format for sqs
     sqs_entries = [{'Id': str(i), 'MessageBody': f'{{"Link": "{link}", "Depth": {depth}}}'}
