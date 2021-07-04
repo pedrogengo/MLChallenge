@@ -33,7 +33,8 @@ def handler(event, context):
     csv_reader = csv_response['Body'].read().decode('utf-8').split('\n')
 
     # Creating the list to send in batch format for sqs
-    sqs_entries = [{'Id': i, 'MessageBody': f'{{"Link": "{link}", "Depth": {depth}}}'}  for i, link in enumerate(csv_reader)]
+    sqs_entries = [{'Id': i, 'MessageBody': f'{{"Link": "{link}", "Depth": {depth}}}'}
+                   for i, link in enumerate(csv_reader)]
     logger.debug('SQS Entries: %s', sqs_entries)
 
     # Retrieve the queue url, in order to use sqs api

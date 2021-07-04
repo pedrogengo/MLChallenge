@@ -92,15 +92,16 @@ class Link():
 
 def update_features(client, table, link, features):
 
-    table = client.Table(table)
-
-    response = table.update_item(
+    response = client.update_item(
+        TableName=table,
         Key={
-            'link': link,
+            'link': {
+                'S': link,
+            }
         },
         UpdateExpression="set features=:f",
         ExpressionAttributeValues={
-            ':f': features
+            ':f': {"M": features}
         },
         ReturnValues="UPDATED_NEW"
     )
