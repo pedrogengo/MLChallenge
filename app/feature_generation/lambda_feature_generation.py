@@ -132,7 +132,7 @@ def handler(event, context):
     if len(response['Items']) == 0:
         link_instance = Link(link)
         features = link_instance.get_features()
-        dynamo_features = {feature: {'N': value} for feature, value in features.items()}
+        dynamo_features = {feature: {'N': str(value)} for feature, value in features.items()}
         response = client.put_item(
             TableName=tablename,
             Item={
@@ -155,7 +155,7 @@ def handler(event, context):
         else:
             link_instance = Link(link)
             features = link_instance.get_features()
-            dynamo_features = {feature: {'N': value} for feature, value in features.items()}
+            dynamo_features = {feature: {'N': str(value)} for feature, value in features.items()}
             response = update_features(client, tablename, link, dynamo_features)
     else:
         raise Exception("Error when calling DynamoDB. Try again later")

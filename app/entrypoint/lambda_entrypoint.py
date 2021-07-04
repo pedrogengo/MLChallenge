@@ -13,8 +13,7 @@ def handler(event, context):
     msg = {"link": link}
 
     invoke_response = lambda_client.invoke(FunctionName="crawler-feature-generation",
-                                           InvocationType='Event',
                                            Payload=json.dumps(msg))
     print(invoke_response)
-    if invoke_response['statusCode'] == 200:
-        return invoke_response
+    if invoke_response['StatusCode'] == 200:
+        return invoke_response['Payload'].read().decode('utf-8')
