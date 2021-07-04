@@ -25,24 +25,24 @@ In this challenge we developed a crawler application which retrieves information
 +-- app
 |   +-- batch_event
 |       +-- test
-|           +-- lambda_test.py
-|       +-- lambda_batch_event.py
-|       +-- requirements.txt
+|           +-- lambda_test.py: Unit tests of lambda_batch_event.py
+|       +-- lambda_batch_event.py: Application that was triggered when put csv file inside the s3 bucket and send the links to SQS
+|       +-- requirements.txt: python requirements for this lambda
 |   +-- entrypoint
 |       +-- test
-|           +-- lambda_test.py
-|       +-- lambda_entrypoint.py
-|       +-- requirements.txt
+|           +-- lambda_test.py: Unit tests of lambda_entrypoint.py
+|       +-- lambda_entrypoint.py: Application used as backend of API Gateway for get/create features of a link
+|       +-- requirements.txt: python requirements for this lambda
 |   +-- feature_generation
 |       +-- test
-|           +-- lambda_test.py
-|       +-- lambda_feature_generation.py
-|       +-- requirements.txt
+|           +-- lambda_test.py: Unit tests of lambda_feature_generation.py
+|       +-- lambda_feature_generation.py: Application that generates features and put then into Dynamodb
+|       +-- requirements.txt: python requirements for this lambda
 |   +-- processing
 |       +-- test
-|           +-- lambda_test.py
-|       +-- lambda_processing.py
-|       +-- requirements.txt
+|           +-- lambda_test.py: Unit tests of lambda_processing.py
+|       +-- lambda_processing.py: Application that find all links referenced in a page and add its to dynamo
+|       +-- requirements.txt: python requirements for this lambda
 +-- dockerfiles
 |   +-- lambda_batch_event.dockerfile: Dockerfile with the application that we will deploy in Lambda Container
 |   +-- lambda_entrypoint.dockerfile: Dockerfile with the application that we will deploy in Lambda Container
