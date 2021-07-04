@@ -103,7 +103,7 @@ def handler(event, context):
     client = boto3.client('dynamodb')
     sqs = boto3.client("sqs")
     tablename = os.environ['TABLE_NAME']
-    queue_name = os.environ["QUEUE_NAME"]
+    queue_url = os.environ["QUEUE_URL"]
 
     visited_urls = get_visited_urls(client, tablename)
 
@@ -132,7 +132,7 @@ def handler(event, context):
             'details': 'Done'
         }
     else:
-        queue_url = sqs.get_queue_url(QueueName=queue_name).get('QueueUrl')
+        # queue_url = sqs.get_queue_url(QueueName=queue_name).get('QueueUrl')
         # logger.debug("Queue URL is %s", queue_url)
 
         # Sending entries to sqs

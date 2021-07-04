@@ -11,11 +11,7 @@ Resources:
       PackageType: Image
       Code:
         ImageUri: 275448561531.dkr.ecr.sa-east-1.amazonaws.com/crawler-entrypoint:latest
-      Timeout: 5
-      Environment:
-        Variables:
-          bucket: crawler-ml-challenge
-
+      Timeout: 10
 
   FeatureGeneration:
     Type: AWS::Lambda::Function
@@ -25,10 +21,10 @@ Resources:
       PackageType: Image
       Code:
         ImageUri: 275448561531.dkr.ecr.sa-east-1.amazonaws.com/crawler-feature-generation:latest
-      Timeout: 5
+      Timeout: 10
       Environment:
         Variables:
-          bucket: crawler-ml-challenge
+          TABLE_NAME: crawler_appearences
 
   Processing:
     Type: AWS::Lambda::Function
@@ -38,10 +34,11 @@ Resources:
       PackageType: Image
       Code:
         ImageUri: 275448561531.dkr.ecr.sa-east-1.amazonaws.com/crawler-processing:latest
-      Timeout: 5
+      Timeout: 10
       Environment:
         Variables:
           QUEUE_URL: !Ref UrlsQueue
+          TABLE_NAME: crawler_appearences
   
   BatchEvent:
     Type: AWS::Lambda::Function
@@ -51,11 +48,12 @@ Resources:
       PackageType: Image
       Code:
         ImageUri: 275448561531.dkr.ecr.sa-east-1.amazonaws.com/crawler-batch-event:latest
-      Timeout: 5
+      Timeout: 10
       Environment:
         Variables:
           BUCKET: crawler-ml-challenge
           QUEUE_URL: !Ref UrlsQueue
+          DEPTH: 5
 
   UrlsQueue:
     Type: AWS::SQS::Queue

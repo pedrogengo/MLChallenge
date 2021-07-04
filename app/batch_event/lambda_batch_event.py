@@ -7,17 +7,17 @@ logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 def get_environment_variables():
-    queue_name = os.environ["QUEUE_NAME"]
+    queue_url = os.environ["QUEUE_URL"]
     depth = os.environ['DEPTH']
     bucket = os.environ['BUCKET']
-    return queue_name, bucket, depth
+    return queue_url, bucket, depth
 
 def handler(event, context):
     # Start clients
     s3 = boto3.client('s3')
     sqs = boto3.client("sqs")
 
-    queue_name, bucket, depth = get_environment_variables()
+    queue_url, bucket, depth = get_environment_variables()
 
     # Getting the content of csv inside s3 bucket
     try:
@@ -38,7 +38,7 @@ def handler(event, context):
     logger.debug('SQS Entries: %s', sqs_entries)
 
     # Retrieve the queue url, in order to use sqs api
-    queue_url = sqs.get_queue_url(QueueName=queue_name).get('QueueUrl')
+    # queue_url = sqs.get_queue_url(QueueName=queue_name).get('QueueUrl')
     logger.debug("Queue URL is %s", queue_url)
 
     # Sending entries to sqs
