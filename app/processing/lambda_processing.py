@@ -3,6 +3,7 @@ import requests
 import json
 import boto3
 import os
+import re
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
@@ -34,6 +35,9 @@ class Crawler:
             if path:
                 if path.startswith('/'):
                     path = urljoin(url, path)
+            if re.match(
+                r'[http|https\:\/\/]?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.[a-zA-Z]{2,6}[a-zA-Z0-9\.\&\/\?\:@\-_=#]*',
+                    path):
                 paths.append(path)
         return paths
 
@@ -100,24 +104,43 @@ def update_appearances(client, table, link, appearances):
     return response
 
 def handler(event, context):
+
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    logger.info("Event: %s", event)
+
     client = boto3.client('dynamodb')
     sqs = boto3.client("sqs")
     tablename = os.environ['TABLE_NAME']
     queue_url = os.environ["QUEUE_URL"]
 
-    visited_urls = get_visited_urls(client, tablename)
-
     record = event["Records"][0]
     body = json.loads(record['body'])
     depth = body['Depth']
     query_url = body['Link']
-    
+
+    if re.match(
+        r'[http|https\:\/\/]?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.[a-zA-Z]{2,6}[a-zA-Z0-9\.\&\/\?\:@\-_=#]*',
+            query_url) is None:
+
+        logger.error("ERROR: Invalid URL")
+        return {
+            'statusCode': 500,
+            'body': json.dumps('Invalid URL')
+        }
+ 
+    visited_urls = get_visited_urls(client, tablename)
+
+
+    logger.info("Running Crawler")
     crawler = Crawler(query_url)
     crawler.run()
     references = crawler.urls_to_visit
+    logger.info("URLs to visit: %s", references)
 
     # primeiro inserir minha url no RDS com appearence 0
     create_dynamo_item(client, tablename, query_url, 0)
+    logger.info("Created query link in dynamo")
 
     # depois passar por references e se nao existir no visited_urls, crio com appearence 1
     for link in references:
@@ -125,6 +148,8 @@ def handler(event, context):
             update_appearances(client, tablename, link, 1)
         else:
             create_dynamo_item(client, tablename, link, 1)
+    logger.info("Updated appearances")
+
     if depth == 0:
         body = {
             'query_url': query_url,
@@ -147,6 +172,7 @@ def handler(event, context):
             }
 
         except Exception as e:
+            logger.error("ERROR: %s", str(e))
             return {
                 'statusCode': 500,
                 'body': json.dumps(str(e))

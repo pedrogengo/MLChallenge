@@ -65,6 +65,7 @@ Resources:
     Properties: 
       EventSourceArn: !GetAtt UrlsQueue.Arn
       FunctionName: !Ref Processing
+      BatchSize: 1
 
   Role:
     Type: AWS::IAM::Role

@@ -4,7 +4,7 @@
 
 ## Overview
 
-In this challenge we developed a crawler application which retrieve information about how many times a link was referenced in another page and save this information in a database. After that, we enriched each link with features of themself. With this features, we made a model to predict references of a link and serves this model in a REST API.
+In this challenge we developed a crawler application which retrieves information about how many times a link was referenced in another page and save this information in a database. After that, we enriched each link with features of themself. With this features, we made a model to predict references of a link and serves this model in a REST API.
 
 ## Goals
 
@@ -17,3 +17,40 @@ In this challenge we developed a crawler application which retrieve information 
 
 ## Understanding the repository
 
+```
+.
++-- .github
+|   +-- workflows
+|       +-- cicd.yaml: CI/CD pipeline for Github Actions
++-- app
+|   +-- batch_event
+|       +-- test
+|           +-- lambda_test.py
+|       +-- lambda_batch_event.py
+|       +-- requirements.txt
+|   +-- entrypoint
+|       +-- test
+|           +-- lambda_test.py
+|       +-- lambda_entrypoint.py
+|       +-- requirements.txt
+|   +-- feature_generation
+|       +-- test
+|           +-- lambda_test.py
+|       +-- lambda_feature_generation.py
+|       +-- requirements.txt
+|   +-- processing
+|       +-- test
+|           +-- lambda_test.py
+|       +-- lambda_processing.py
+|       +-- requirements.txt
++-- dockerfiles
+|   +-- lambda_batch_event.dockerfile: Dockerfile with the application that we will deploy in Lambda Container
+|   +-- lambda_entrypoint.dockerfile: Dockerfile with the application that we will deploy in Lambda Container
+|   +-- lambda_feature_generation.dockerfile: Dockerfile with the application that we will deploy in Lambda Container
+|   +-- lambda_processing.dockerfile: Dockerfile with the application that we will deploy in Lambda Container
++-- infra
+|   +-- infra.yaml: IaaC contaning all resources required for our application
++-- README.md
+```
+
+## Future works

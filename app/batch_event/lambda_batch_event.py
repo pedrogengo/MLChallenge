@@ -24,7 +24,7 @@ def handler(event, context):
         query_table = event['Records'][0]['s3']['object']['key']
 
     except KeyError:
-        logger.debug('ERROIntegration error with S3. Try again later')
+        logger.error('ERROIntegration error with S3. Try again later')
         return {
             'statusCode': 500,
             'body': json.dumps('Integration error with S3. Try again later')
