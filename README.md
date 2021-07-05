@@ -15,6 +15,7 @@ In this challenge we developed a crawler application which retrieves information
 
 ## Architecture
 
+![architecture](architecture.jpg)
 
 ## Understanding the repository
 
@@ -68,7 +69,7 @@ In this challenge we developed a crawler application which retrieves information
 
 - The depth of crawler search was defined as 3. You can change this at infra.yaml (inside the BatchEvent Resource);
 - I used only a few link to create the database because I don't want to be charged by AWS and DynamoDB has a limit of throughput of 5 in the free-tier (for read and write);
-- After crawler finished, I used the export to S3 function of DynamoDB and downloaded the daata to train the model in my local machine.
+- After crawler finished, I used the export to S3 function of DynamoDB and downloaded the data to train the model in my local machine.
 
 ## Configuring in your account
 

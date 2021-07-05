@@ -1,0 +1,66 @@
+{
+	"variables": [],
+	"info": {
+		"name": "crawler-api",
+		"_postman_id": "ead8a6f1-6b56-6a31-87de-b923c4a9694f",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get link features",
+			"request": {
+				"url": {
+					"raw": "https://<APIID>.execute-api.sa-east-1.amazonaws.com/prod/link_features/?link=https://pedrogengo.edu.br",
+					"protocol": "https",
+					"host": [
+						"<APIID>",
+						"execute-api",
+						"sa-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"prod",
+						"link_features",
+						""
+					],
+					"query": [
+						{
+							"key": "link",
+							"value": "https://pedrogengo.edu.br",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "predict appearances",
+			"request": {
+				"url": "https://<APIID>.execute-api.sa-east-1.amazonaws.com/prod/predict",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"link\":\"https://www.google.com\"}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

@@ -57,7 +57,7 @@ Resources:
       PackageType: Image
       Code:
         ImageUri: !Ref PredictImage
-      Timeout: 10
+      Timeout: 180
       Environment:
         Variables:
           TABLE_NAME: !Ref DynamoTableName
@@ -279,3 +279,11 @@ Resources:
         Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Predict.Arn}/invocations
       ResourceId: !Ref PredictResource
       RestApiId: !Ref API
+  
+  Deployment:
+    DependsOn: [PredictRequestPOST, LinkFeaturesRequestGET]
+    Type: 'AWS::ApiGateway::Deployment'
+    Properties:
+      RestApiId: !Ref API
+      Description: Deployment
+      StageName: prod
