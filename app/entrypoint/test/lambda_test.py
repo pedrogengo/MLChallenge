@@ -18,4 +18,4 @@ def test_handler(mock_boto3):
 
     event = {"queryStringParameters": {"link": ""}}
     response = lambda_entrypoint.handler(event, None)
-    assert response['statusCode'] == 500
+    assert response['statusCode'] == 400
