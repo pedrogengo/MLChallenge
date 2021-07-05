@@ -62,7 +62,7 @@ def get_visited_urls(client, tablename):
         data.extend(response['Items'])
     
     if len(data) > 0:
-        visited_urls = [item['link']['S'] for item in data]
+        visited_urls = [item['link']['S'] for item in data if item.get('appearances')]
     else:
         visited_urls = []
     return visited_urls
@@ -134,11 +134,12 @@ def handler(event, context):
     references = crawler.urls_to_visit
     logger.info("URLs to visit: %s", references)
 
-    # Insert my link in Dynamo with  appearence 0
-    create_dynamo_item(client, tablename, query_url, 0)
-    lambda_client.invoke(FunctionName="crawler-feature-generation",
-                                           InvocationType='Event',
-                                           Payload=json.dumps({'link': query_url}))
+    if query_url not in visited_urls:
+        # Insert my link in Dynamo with  appearence 0
+        create_dynamo_item(client, tablename, query_url, 0)
+        lambda_client.invoke(FunctionName="crawler-feature-generation",
+                                            InvocationType='Event',
+                                            Payload=json.dumps({'link': query_url}))
     logger.info("Created query link in dynamo")
 
     # Iterate over refrences and, if doesnt exists inside visited_urls, create with appearence 1

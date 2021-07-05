@@ -40,7 +40,7 @@ def test_crawler_run(mock_requests, mock_bs):
 
 @patch('lambda_processing.boto3')
 def test_get_visited_urls(mock_boto3):
-    mock_boto3.scan.return_value = {'Items': [{'link': {'S': 'site1'}}, {'link': {'S': 'site2'}}]}
+    mock_boto3.scan.return_value = {'Items': [{'link': {'S': 'site1'}, 'appearances': 2}, {'link': {'S': 'site2'}, 'appearances': 2}]}
     response = lambda_processing.get_visited_urls(mock_boto3, 'name')
     assert response == ['site1', 'site2']
 
@@ -48,8 +48,8 @@ def test_get_visited_urls(mock_boto3):
     response = lambda_processing.get_visited_urls(mock_boto3, 'name')
     assert response == []
 
-    mock_boto3.scan.side_effect = [{'Items': [{'link': {'S': 'site1'}}, {'link': {'S': 'site2'}}], 'LastEvaluatedKey': True},
-                                   {'Items': [{'link': {'S': 'site3'}}, {'link': {'S': 'site4'}}]}]
+    mock_boto3.scan.side_effect = [{'Items': [{'link': {'S': 'site1'}, 'appearances': 2}, {'link': {'S': 'site2'}, 'appearances': 2}], 'LastEvaluatedKey': True},
+                                   {'Items': [{'link': {'S': 'site3'}, 'appearances': 2}, {'link': {'S': 'site4'}, 'appearances': 2}]}]
     response = lambda_processing.get_visited_urls(mock_boto3, 'name')
     assert response == ['site1', 'site2', 'site3', 'site4']
 
@@ -66,9 +66,10 @@ def test_handler_wrong_url(mock_boto3, mock_os):
 @patch('lambda_processing.Crawler')
 @patch('lambda_processing.create_dynamo_item')
 @patch('lambda_processing.update_appearances')
-def test_handler_depth_0(mock_update, mock_create, mock_crawler, mock_boto3, mock_os):
+@patch('lambda_processing.get_visited_urls')
+def test_handler_depth_0(mock_get_visited, mock_update, mock_create, mock_crawler, mock_boto3, mock_os):
     mock_os.environ.__getitem__.side_effect = ['tablename', 'queue_url']
-    mock_boto3.client().scan.return_value = {'Items': [{'link': {'S': 'site1'}}, {'link': {'S': 'site2'}}]}
+    mock_get_visited.return_value = ['site1', 'site2']
     mock_crawler().urls_to_visit = ['site1', 'site3']
     event = {'Records': [{'body': '{"Depth": 0, "Link": "https://www.google.com"}'}]}
     response = lambda_processing.handler(event, None)
@@ -82,9 +83,10 @@ def test_handler_depth_0(mock_update, mock_create, mock_crawler, mock_boto3, moc
 @patch('lambda_processing.Crawler')
 @patch('lambda_processing.create_dynamo_item')
 @patch('lambda_processing.update_appearances')
-def test_handler_depth_gt_0_small(mock_update, mock_create, mock_crawler, mock_boto3, mock_os):
+@patch('lambda_processing.get_visited_urls')
+def test_handler_depth_gt_0_small(mock_get_visited, mock_update, mock_create, mock_crawler, mock_boto3, mock_os):
     mock_os.environ.__getitem__.side_effect = ['tablename', 'queue_url']
-    mock_boto3.client().scan.return_value = {'Items': [{'link': {'S': 'site1'}}, {'link': {'S': 'site2'}}]}
+    mock_get_visited.return_value = ['site1', 'site2']
     mock_crawler().urls_to_visit = ['site1', 'site3']
     event = {'Records': [{'body': '{"Depth": 2, "Link": "https://www.google.com"}'}]}
     response = lambda_processing.handler(event, None)
@@ -101,9 +103,10 @@ def test_handler_depth_gt_0_small(mock_update, mock_create, mock_crawler, mock_b
 @patch('lambda_processing.Crawler')
 @patch('lambda_processing.create_dynamo_item')
 @patch('lambda_processing.update_appearances')
-def test_handler_depth_gt_0_small(mock_update, mock_create, mock_crawler, mock_boto3, mock_os):
+@patch('lambda_processing.get_visited_urls')
+def test_handler_depth_gt_0_small(mock_get_visited, mock_update, mock_create, mock_crawler, mock_boto3, mock_os):
     mock_os.environ.__getitem__.side_effect = ['tablename', 'queue_url']
-    mock_boto3.client().scan.return_value = {'Items': [{'link': {'S': 'site1'}}, {'link': {'S': 'site2'}}]}
+    mock_get_visited.return_value = ['site1', 'site2']
     mock_crawler().urls_to_visit = ['site1', 'site3', 's4', 's5', 's6', 's7', 's8', 's9', 's0', 's10', 's11', 's12']
     event = {'Records': [{'body': '{"Depth": 2, "Link": "https://www.google.com"}'}]}
     response = lambda_processing.handler(event, None)

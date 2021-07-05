@@ -104,7 +104,7 @@ Resources:
         Variables:
           BUCKET: !Ref S3BucketName
           QUEUE_URL: !Ref UrlsQueue
-          DEPTH: 5
+          DEPTH: 3
 
   UrlsQueue:
     Type: AWS::SQS::Queue
