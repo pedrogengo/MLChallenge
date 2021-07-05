@@ -18,7 +18,7 @@ def handler(event, context):
 
         logger.error("ERROR: Invalid URL")
         return {
-            'statusCode': 500,
+            'statusCode': 400,
             'body': json.dumps('Invalid URL')
         }
 

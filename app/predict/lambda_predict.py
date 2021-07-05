@@ -2,6 +2,7 @@ import joblib
 import os
 import boto3
 import json
+import re
 from io import BytesIO
 
 
@@ -28,7 +29,18 @@ def handler(event, context):
 
         tablename = os.environ['TABLE_NAME']
 
-        link = event["link"]
+        link = json.loads(event['body'])['link']
+
+        # Verify if is a valid link
+        if re.match(
+            r'[http|https\:\/\/]?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.[a-zA-Z]{2,6}[a-zA-Z0-9\.\&\/\?\:@\-_=#]*',
+                link) is None:
+
+            return {
+                'statusCode': 400,
+                'body': json.dumps('Invalid URL')
+            }
+
         payload = {"link": link}
 
         # Verify if the link already exists in our database and have appearances

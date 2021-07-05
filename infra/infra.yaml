@@ -210,4 +210,72 @@ Resources:
                   - "sqs:*"
                   - "dynamodb:*"
                 Resource: '*'
-      MaxSessionDuration: 3600 
+      MaxSessionDuration: 3600
+  
+  API:
+    Type: AWS::ApiGateway::RestApi
+    Properties: 
+      Name: crawler-api
+      Description: API used for get link features and predict appearances
+      FailOnWarnings: true
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+  
+  APILambdaPermissionEntrypoint:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      FunctionName: !GetAtt Entrypoint.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${API}/*'
+  
+  APILambdaPermissionPredict:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      FunctionName: !GetAtt Predict.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${API}/*'
+  
+  LinkFeaturesResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref API
+      ParentId: !GetAtt API.RootResourceId
+      PathPart: link_features
+  
+  PredictResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref API
+      ParentId: !GetAtt API.RootResourceId
+      PathPart: predict
+  
+  LinkFeaturesRequestGET:
+    DependsOn: APILambdaPermissionEntrypoint
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+      Type: AWS_PROXY
+      IntegrationHttpMethod: POST
+      Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Entrypoint.Arn}/invocations
+      RequestParameters:
+        method.request.querystring.link: True
+      ResourceId: !Ref LinkFeaturesResource
+      RestApiId: !Ref API
+  
+  LinkFeaturesRequestGET:
+    DependsOn: APILambdaPermissionPredict
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+      Type: AWS_PROXY
+      IntegrationHttpMethod: POST
+      Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Predict.Arn}/invocations
+      ResourceId: !Ref PredictResource
+      RestApiId: !Ref API
