@@ -48,7 +48,7 @@ def test_handler_new_link(mock_get_model, mock_boto3, mock_os):
     mock_boto3.client().query.return_value = {'Items': []}
     mock_boto3.client().invoke.return_value = {
                                                 'StatusCode': 200,
-                                                'Payload': io.BytesIO(b'{"features": {"feature1": "2"}}')
+                                                'Payload': io.BytesIO(b'{"body": "{\\"features\\": {\\"feature1\\": \\"2\\"}}"}')
                                               }
     event = {'body': '{"link": "https://www.google.com"}'}
     response = lambda_predict.handler(event, None)

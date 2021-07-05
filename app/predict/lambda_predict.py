@@ -20,6 +20,25 @@ def get_model():
             model = ''
     return model
 
+
+def update_appearances(client, table, link, appearances):
+
+    response = client.update_item(
+        TableName=table,
+        Key={
+            'link': {
+                'S': link,
+            }
+        },
+        UpdateExpression='set appearances=:f',
+        ExpressionAttributeValues={
+            ':f': {'N': str(appearances)}
+        },
+        ReturnValues='UPDATED_NEW'
+    )
+    return response
+
+
 def handler(event, context):
 
     model = get_model()
@@ -59,8 +78,10 @@ def handler(event, context):
             invoke_response = lambda_client.invoke(FunctionName="crawler-feature-generation",
                                             Payload=json.dumps(payload))
             decoded_response = json.loads(invoke_response['Payload'].read().decode('utf-8'))
-            features = list(decoded_response['features'].values())
+            features = sorted(json.loads(decoded_response['body'])['features'].items())
+            features = [int(i[1]) for i in features]
             appearances = int(model.predict([features]))
+            update_appearances(dynamo, tablename, link, appearances)
 
         else:
             appearances = int(dynamo_response['Items'][0]['appearances']['N'])

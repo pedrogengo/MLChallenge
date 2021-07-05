@@ -57,13 +57,18 @@ In this challenge we developed a crawler application which retrieves information
 |   +-- lambda_predict.dockerfile: Dockerfile with the application that we will deploy in Lambda Container
 +-- infra
 |   +-- infra.yaml: IaaC contaning all resources required for our application
++-- model_training
+|   +-- data.json: Data generate by crawler
+|   +-- model_appearance.joblib: Model artifact used to predict
+|   +-- model_training.ipynb: Notebook used to train and save the model
 +-- README.md
 ```
 
 ## Assumptions
 
-- The depth of crawler search was defined as 5. You can change this at infra.yaml (inside the BatchEvent Resource);
+- The depth of crawler search was defined as 3. You can change this at infra.yaml (inside the BatchEvent Resource);
 - I used only a few link to create the database because I don't want to be charged by AWS and DynamoDB has a limit of throughput of 5 in the free-tier (for read and write);
+- After crawler finished, I used the export to S3 function of DynamoDB and downloaded the daata to train the model in my local machine.
 
 ## Configuring in your account
 
@@ -89,7 +94,7 @@ To use this application in your account you should follow the following steps:
 
 9. (OPTIONAL) This upload will start the crawling process. You can follow the progress at SQS, looking at **Messages available** option in the menu of your queue. When it decreases to zero, it means that crawler process finished;
 10. To uses the predict route of API Gateway, you need to search again for S3 and enters in **bucket-model**;
-11. Download the model here and upload it to the bucket;
+11. Download the model [here](model_training/model_appearance.joblib) and upload it to the bucket;
 12. Go to the **crawler-predict-appearances Lambda** and change de enviroment variable **MODEL_NAME** to the model that you uploaded in S3;
 13. Finished! Now you can use the API!
 
@@ -99,4 +104,5 @@ All this work was developed with free-tiers components in order to reduce costs.
 
 1. Change DynamoDB ProvisionedThroughput for PAY_PER_REQUEST, in other to scales our application;
 2. Create the buckets in another repository, in order to don't have problems when we need to delete the stack;
-3. Create CI steps to test the integration between components, not only unit tests.
+3. Create CI steps to test the integration between components, not only unit tests;
+4. Change Lambda predict to an on-demand instance, in order to reduce cold start.
