@@ -44,11 +44,17 @@ In this challenge we developed a crawler application which retrieves information
 |           +-- lambda_test.py: Unit tests of lambda_processing.py
 |       +-- lambda_processing.py: Application that find all links referenced in a page and add its to dynamo
 |       +-- requirements.txt: python requirements for this lambda
++-- predict
+|       +-- test
+|           +-- lambda_test.py: Unit tests of lambda_batch_event.py
+|       +-- lambda_predict.py: Application used as backend of API Gateway to predict appearances of a link
+|       +-- requirements.txt: python requirements for this lambda
 +-- dockerfiles
 |   +-- lambda_batch_event.dockerfile: Dockerfile with the application that we will deploy in Lambda Container
 |   +-- lambda_entrypoint.dockerfile: Dockerfile with the application that we will deploy in Lambda Container
 |   +-- lambda_feature_generation.dockerfile: Dockerfile with the application that we will deploy in Lambda Container
 |   +-- lambda_processing.dockerfile: Dockerfile with the application that we will deploy in Lambda Container
+|   +-- lambda_predict.dockerfile: Dockerfile with the application that we will deploy in Lambda Container
 +-- infra
 |   +-- infra.yaml: IaaC contaning all resources required for our application
 +-- README.md
@@ -61,6 +67,17 @@ To use this application in your account you should follow the following steps:
 1. Fork this repository;
 2. Add your AWS credentials in Github Secrets;
 3. Make a commit to start the CI CD pipeline;
+4. Wait Github actions finish;
+5. When all the steps were completed, access your AWS account in **sa-east-1** region;
+6. Search for S3 and enters in **crawler-ml-challenge** (or the name you choose, if you change this in infra.yaml);
+7. Creates a folder called **inputs/** and upload a csv file with each link you want to start the crawler in one line, e.g:
+
+| https://www.google.com    |
+|---------------------------|
+| https://www.wikipedia.com |
+|                           |
+
+
 
 
 ## Future works

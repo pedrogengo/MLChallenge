@@ -259,9 +259,9 @@ Resources:
       AuthorizationType: NONE
       HttpMethod: GET
       Integration:
-      Type: AWS_PROXY
-      IntegrationHttpMethod: POST
-      Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Entrypoint.Arn}/invocations
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Entrypoint.Arn}/invocations
       RequestParameters:
         method.request.querystring.link: True
       ResourceId: !Ref LinkFeaturesResource
@@ -274,8 +274,8 @@ Resources:
       AuthorizationType: NONE
       HttpMethod: POST
       Integration:
-      Type: AWS_PROXY
-      IntegrationHttpMethod: POST
-      Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Predict.Arn}/invocations
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Predict.Arn}/invocations
       ResourceId: !Ref PredictResource
       RestApiId: !Ref API
