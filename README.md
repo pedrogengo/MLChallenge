@@ -66,18 +66,30 @@ To use this application in your account you should follow the following steps:
 
 1. Fork this repository;
 2. Add your AWS credentials in Github Secrets;
-3. Make a commit to start the CI CD pipeline;
-4. Wait Github actions finish;
-5. When all the steps were completed, access your AWS account in **sa-east-1** region;
-6. Search for S3 and enters in **crawler-ml-challenge** (or the name you choose, if you change this in infra.yaml);
-7. Creates a folder called **inputs/** and upload a csv file with each link you want to start the crawler in one line, e.g:
+3. Change the nome of the two buckets in infra.yaml for unique names (try to put an identifier after the proposed name like: crawler-bucket-model-<'yourname'>);
+4. Make a commit to start the CI CD pipeline;
+5. Wait Github actions finish;
+6. When all the steps were completed, access your AWS account in **sa-east-1** region;
+7. Search for S3 and enters in **crawler-ml-challenge** (or the name you choose, if you change this in infra.yaml);
+8. Creates a folder called **inputs/** and upload a csv file with each link you want to start the crawler in one line, e.g:
 
+<center>
+
+|   |
+|---|
 | https://www.google.com    |
-|---------------------------|
 | https://www.wikipedia.com |
-|                           |
 
+</center>
 
-
+9. This upload will start the crawling process. You can follow the progress at SQS, looking at **Messages available** option in the menu of your queue. When it decreases to zero, it means that crawler process finished;
+10. To uses the predict route of API Gateway, you need to search again for S3 and enters in **bucket-model**;
+11. Download the model here and upload it to the bucket;
+12. Go to the **crawler-predict-appearances Lambda** and change de enviroment variable **MODEL_NAME** to the model that you uploaded in S3;
+13. Finished! Now you can use the API!
 
 ## Future works
+
+All this work was developed with free-tiers components in order to reduce costs. For future works we can do:
+
+1. Change DynamoDB for 

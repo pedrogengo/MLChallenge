@@ -34,7 +34,7 @@ Parameters:
 
   BucketModelName:
     Type: String
-    Default: bucket-model
+    Default: crawler-bucket-model
     Description: Bucket name of our model registry
 
 Resources:
