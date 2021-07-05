@@ -70,7 +70,7 @@ In this challenge we developed a crawler application which retrieves information
 To use this application in your account you should follow the following steps:
 
 1. Fork this repository;
-2. Add your AWS credentials in Github Secrets;
+2. Add your AWS credentials in Github Secrets ([How to get AWS Credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#email-and-password-for-your-account) and [How to add Github Secrets](https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository));
 3. Change the nome of the two buckets in infra.yaml for unique names (try to put an identifier after the proposed name like: crawler-bucket-model-<'yourname'>);
 4. Make a commit to start the CI CD pipeline;
 5. Wait Github actions finish;

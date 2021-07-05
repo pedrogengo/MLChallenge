@@ -20,7 +20,6 @@ class Crawler:
     """
 
     def __init__(self, url):
-        # self.visited_urls = visited_urls
         self.urls_to_visit = []
         self.query_url = url
 
@@ -40,10 +39,6 @@ class Crawler:
                     path):
                 paths.append(path)
         return paths
-
-    # def add_url_to_visit(self, url):
-    #     if url not in self.visited_urls and url not in self.urls_to_visit:
-    #         self.urls_to_visit.append(url)
 
     def crawl(self, url):
         html = self.download_url(url)
@@ -111,12 +106,13 @@ def handler(event, context):
 
     client = boto3.client('dynamodb')
     sqs = boto3.client("sqs")
+    lambda_client = boto3.client('lambda')
     tablename = os.environ['TABLE_NAME']
     queue_url = os.environ["QUEUE_URL"]
 
     record = event["Records"][0]
     body = json.loads(record['body'])
-    depth = body['Depth']
+    depth = int(body['Depth'])
     query_url = body['Link']
 
     if re.match(
@@ -125,12 +121,12 @@ def handler(event, context):
 
         logger.error("ERROR: Invalid URL")
         return {
-            'statusCode': 500,
+            'statusCode': 400,
             'body': json.dumps('Invalid URL')
         }
  
     visited_urls = get_visited_urls(client, tablename)
-
+    logger.info("Visited URLs: %s", visited_urls)
 
     logger.info("Running Crawler")
     crawler = Crawler(query_url)
@@ -138,16 +134,22 @@ def handler(event, context):
     references = crawler.urls_to_visit
     logger.info("URLs to visit: %s", references)
 
-    # primeiro inserir minha url no RDS com appearence 0
+    # Insert my link in Dynamo with  appearence 0
     create_dynamo_item(client, tablename, query_url, 0)
+    lambda_client.invoke(FunctionName="crawler-feature-generation",
+                                           InvocationType='Event',
+                                           Payload=json.dumps({'link': query_url}))
     logger.info("Created query link in dynamo")
 
-    # depois passar por references e se nao existir no visited_urls, crio com appearence 1
+    # Iterate over refrences and, if doesnt exists inside visited_urls, create with appearence 1
     for link in references:
         if link in visited_urls:
             update_appearances(client, tablename, link, 1)
         else:
             create_dynamo_item(client, tablename, link, 1)
+            lambda_client.invoke(FunctionName="crawler-feature-generation",
+                                          InvocationType='Event',
+                                           Payload=json.dumps({'link': link}))
     logger.info("Updated appearances")
 
     if depth == 0:
