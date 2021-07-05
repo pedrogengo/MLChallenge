@@ -267,7 +267,7 @@ Resources:
       ResourceId: !Ref LinkFeaturesResource
       RestApiId: !Ref API
   
-  LinkFeaturesRequestGET:
+  PredictRequestPOST:
     DependsOn: APILambdaPermissionPredict
     Type: AWS::ApiGateway::Method
     Properties:

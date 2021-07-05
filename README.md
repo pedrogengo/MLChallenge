@@ -1,6 +1,6 @@
-# MLChallenge
-
 <p align="center"><img width=12.5% src="https://upload.wikimedia.org/wikipedia/en/thumb/2/20/MercadoLibre.svg/1200px-MercadoLibre.svg.png"></p>
+
+# MLChallenge
 
 ## Overview
 
@@ -60,6 +60,11 @@ In this challenge we developed a crawler application which retrieves information
 +-- README.md
 ```
 
+## Assumptions
+
+- The depth of crawler search was defined as 5. You can change this at infra.yaml (inside the BatchEvent Resource);
+- I used only a few link to create the database because I don't want to be charged by AWS and DynamoDB has a limit of throughput of 5 in the free-tier (for read and write);
+
 ## Configuring in your account
 
 To use this application in your account you should follow the following steps:
@@ -70,8 +75,8 @@ To use this application in your account you should follow the following steps:
 4. Make a commit to start the CI CD pipeline;
 5. Wait Github actions finish;
 6. When all the steps were completed, access your AWS account in **sa-east-1** region;
-7. Search for S3 and enters in **crawler-ml-challenge** (or the name you choose, if you change this in infra.yaml);
-8. Creates a folder called **inputs/** and upload a csv file with each link you want to start the crawler in one line, e.g:
+7. (OPTIONAL) Search for S3 and enters in **crawler-ml-challenge** (or the name you choose, if you change this in infra.yaml);
+8. (OPTIONAL) Creates a folder called **inputs/** and upload a csv file with each link you want to start the crawler in one line, e.g:
 
 <center>
 
@@ -82,7 +87,7 @@ To use this application in your account you should follow the following steps:
 
 </center>
 
-9. This upload will start the crawling process. You can follow the progress at SQS, looking at **Messages available** option in the menu of your queue. When it decreases to zero, it means that crawler process finished;
+9. (OPTIONAL) This upload will start the crawling process. You can follow the progress at SQS, looking at **Messages available** option in the menu of your queue. When it decreases to zero, it means that crawler process finished;
 10. To uses the predict route of API Gateway, you need to search again for S3 and enters in **bucket-model**;
 11. Download the model here and upload it to the bucket;
 12. Go to the **crawler-predict-appearances Lambda** and change de enviroment variable **MODEL_NAME** to the model that you uploaded in S3;
@@ -92,4 +97,6 @@ To use this application in your account you should follow the following steps:
 
 All this work was developed with free-tiers components in order to reduce costs. For future works we can do:
 
-1. Change DynamoDB for 
+1. Change DynamoDB ProvisionedThroughput for PAY_PER_REQUEST, in other to scales our application;
+2. Create the buckets in another repository, in order to don't have problems when we need to delete the stack;
+3. Create CI steps to test the integration between components, not only unit tests.
